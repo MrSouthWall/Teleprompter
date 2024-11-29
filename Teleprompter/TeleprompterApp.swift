@@ -26,6 +26,7 @@ struct TeleprompterApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .colorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }

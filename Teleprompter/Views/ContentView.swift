@@ -11,41 +11,60 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
-
+    
+    @State private var isShowAddNewItemView = false
+    @State private var isShowSettingsView = false
+    
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
                 ForEach(items) { item in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        ItemContentView(item: item)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        Text(item.title)
                     }
+                    
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("提词器")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
                 ToolbarItem {
                     Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                        Label("添加文案", systemImage: "plus")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("设置", systemImage: "gear") {
+                        isShowSettingsView.toggle()
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
+            .sheet(isPresented: $isShowAddNewItemView) {
+                AddNewItemView()
+                    .interactiveDismissDisabled(true)
+                    .colorScheme(.dark)
+            }
+            .sheet(isPresented: $isShowSettingsView) {
+                SettingsView()
+                    .colorScheme(.dark)
+            }
+            .onChange(of: isShowAddNewItemView) { oldValue, newValue in
+                print(newValue)
+            }
         }
     }
-
+    
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+            isShowAddNewItemView.toggle()
         }
     }
-
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
