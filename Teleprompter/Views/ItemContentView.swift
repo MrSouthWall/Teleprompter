@@ -49,7 +49,7 @@ struct ItemContentView: View {
                 Color.clear
                     .frame(height: 100)
             }
-            .ignoresSafeArea()
+            .ignoresSafeArea(edges: .vertical)
             .scaleEffect(y: item.isMirror ? -1 : 1 ,anchor: .center)
             /* 一个奇怪的 Bug
              不知道 .scaleEffect 修改器和 .onScrollGeometryChange 有什么冲突，只要我设置为 Y 轴反转，在开始滚动时，ScrollView 的位置就会卡一下。
