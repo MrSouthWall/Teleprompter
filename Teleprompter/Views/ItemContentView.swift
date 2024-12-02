@@ -14,11 +14,11 @@ enum StyleSettingOptions {
 
 struct ItemContentView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var sessionManager = WatchSessionManager.shared
     
     @Bindable var item: Item
     
     /// 是否播放
-    @State private var isPlaying: Bool = false
     @State private var timer: Timer? = nil
     
     /// 绑定 ScrollView 的位置
@@ -58,7 +58,13 @@ struct ItemContentView: View {
              Fix: 似乎发现了 Bug 产生的原因，是因为没有忽略安全边距，如果去除 .ignoresSafeArea() 问题则会重现
              */
             .scrollPosition($position)
-            .onTapGesture(perform: switchPlayStatus)
+            .onTapGesture {
+                sessionManager.isPlaying.toggle()
+            }
+            .onChange(of: sessionManager.isPlaying) { oldValue, newValue in
+                playScrolling()
+                print("isPlaying值切换为：\(newValue)")
+            }
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 geometry.contentOffset.y
             } action: { oldValue, newValue in
@@ -130,14 +136,14 @@ struct ItemContentView: View {
         // 屏幕中间的播放按钮
         .overlay {
             Button {
-                switchPlayStatus()
+                sessionManager.isPlaying.toggle()
             } label: {
                 Image(systemName: "play.circle")
                     .font(.system(size: 80))
                     .fontWeight(.light)
             }
-            .opacity(isPlaying ? 0 : 0.75)
-            .animation(.smooth(duration: 0.2), value: isPlaying)
+            .opacity(sessionManager.isPlaying ? 0 : 0.75)
+            .animation(.smooth(duration: 0.2), value: sessionManager.isPlaying)
         }
         .sheet(isPresented: $isShowEditContentView) {
             ModifyContentView(item: item)
@@ -150,7 +156,7 @@ struct ItemContentView: View {
         HStack(spacing: 20) {
             // 返回按钮
             Button {
-                isPlaying = false
+                sessionManager.isPlaying = false
                 item.isRotating = false
                 dismiss()
             } label: {
@@ -213,23 +219,28 @@ struct ItemContentView: View {
         .padding(.vertical, 10)
         .padding(.horizontal)
         .background(.ultraThinMaterial)
-        .opacity(isPlaying ? 0 : 1)
-        .animation(.smooth, value: isPlaying)
+        .opacity(sessionManager.isPlaying ? 0 : 1)
+        .animation(.smooth, value: sessionManager.isPlaying)
     }
     
-    /// 切换播放状态
-    private func switchPlayStatus() {
+    /// 播放滚动
+    private func playScrolling() {
         withAnimation {
             styleSettingOptions = nil
         }
-        isPlaying.toggle()
         
-        if isPlaying {
+        if sessionManager.isPlaying {
             print("开始滚动")
             var y = currentOffsetY
             let i = 0.001
             timer = Timer.scheduledTimer(withTimeInterval: i, repeats: true) { _ in
-                y += item.scrollSpeed * i
+//                y += item.scrollSpeed * i
+                // 控制方向
+                if sessionManager.direction {
+                    y += item.scrollSpeed * i
+                } else {
+                    y -= item.scrollSpeed * i
+                }
                 position.scrollTo(y: y)
                 print("currentOffsetY: \(currentOffsetY), y: \(y)")
             }
@@ -239,6 +250,31 @@ struct ItemContentView: View {
             timer = nil
         }
     }
+    
+//    private func fastScrolling(direction: Bool) {
+//        withAnimation {
+//            styleSettingOptions = nil
+//        }
+//        
+//        if sessionManager.isPlaying {
+//            print("开始快速滚动")
+//            var y = currentOffsetY
+//            let i = 0.001
+//            timer = Timer.scheduledTimer(withTimeInterval: i, repeats: true) { _ in
+//                if direction {
+//                    y += 200 * i
+//                } else {
+//                    y -= 200 * i
+//                }
+//                position.scrollTo(y: y)
+//                print("currentOffsetY: \(currentOffsetY), y: \(y)")
+//            }
+//        } else {
+//            print("结束滚动")
+//            timer?.invalidate()
+//            timer = nil
+//        }
+//    }
 }
 
 #Preview {

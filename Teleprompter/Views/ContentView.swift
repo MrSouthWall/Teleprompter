@@ -12,6 +12,8 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
+    @StateObject private var defaultsManager = DefaultsManager.shared
+    
     @State private var isShowAddNewItemView = false
     @State private var isShowSettingsView = false
     
@@ -51,6 +53,10 @@ struct ContentView: View {
             }
             .sheet(isPresented: $isShowSettingsView) {
                 SettingsView()
+                    .colorScheme(.dark)
+            }
+            .sheet(isPresented: $defaultsManager.isFirstStartUp) {
+                StartUpView()
                     .colorScheme(.dark)
             }
             .onChange(of: isShowAddNewItemView) { oldValue, newValue in

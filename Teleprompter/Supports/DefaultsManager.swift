@@ -14,6 +14,9 @@ class DefaultsManager: ObservableObject {
     /// 私有化初始化器，防止从外部创建对象
     private init() { }
     
+    /// 是否首次启动？
+    @AppStorage("isFirstStartUp") var isFirstStartUp: Bool = true
+    
     /// 滚动速度
     @AppStorage("speed") var speed: Double = 100
     /// 是否镜像
