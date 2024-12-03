@@ -12,7 +12,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
-    @StateObject private var defaultsManager = DefaultsManager.shared
+    @StateObject private var defaults = DefaultsManager.shared
     
     @State private var isShowAddNewItemView = false
     @State private var isShowSettingsView = false
@@ -49,15 +49,12 @@ struct ContentView: View {
             .sheet(isPresented: $isShowAddNewItemView) {
                 AddNewItemView()
                     .interactiveDismissDisabled(true)
-                    .colorScheme(.dark)
             }
             .sheet(isPresented: $isShowSettingsView) {
                 SettingsView()
-                    .colorScheme(.dark)
             }
-            .sheet(isPresented: $defaultsManager.isFirstStartUp) {
+            .fullScreenCover(isPresented: $defaults.isFirstStartUp) {
                 StartUpView()
-                    .colorScheme(.dark)
             }
             .onChange(of: isShowAddNewItemView) { oldValue, newValue in
                 print(newValue)

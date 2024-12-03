@@ -9,10 +9,17 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var defaults = DefaultsManager.shared
     
     var body: some View {
         NavigationStack {
             List {
+                Button {
+                    dismiss()
+                    defaults.isFirstStartUp = true
+                } label: {
+                    Label("显示启动页", systemImage: "hands.and.sparkles.fill")
+                }
                 Link(destination: URL(string: "https://github.com/MrSouthWall/Teleprompter")!) {
                     HStack {
                         Text("关于：本 App 为免费开源项目")
