@@ -18,7 +18,7 @@ struct SettingsView: View {
                     dismiss()
                     defaults.isFirstStartUp = true
                 } label: {
-                    Label("显示启动页", systemImage: "hands.and.sparkles.fill")
+                    Label("显示启动页", systemImage: "text.page")
                 }
                 Link(destination: URL(string: "https://github.com/MrSouthWall/Teleprompter")!) {
                     HStack {

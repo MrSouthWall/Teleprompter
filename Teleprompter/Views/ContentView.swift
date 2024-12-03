@@ -14,6 +14,7 @@ struct ContentView: View {
     
     @StateObject private var defaults = DefaultsManager.shared
     
+    /// 是否显示新增提词
     @State private var isShowAddNewItemView = false
     @State private var isShowSettingsView = false
     
@@ -24,7 +25,13 @@ struct ContentView: View {
                     NavigationLink {
                         ItemContentView(item: item)
                     } label: {
-                        Text(item.title)
+                        VStack(alignment: .leading) {
+                            Text(item.title)
+                            Text(item.content)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                        }
                     }
                     
                 }
@@ -55,9 +62,6 @@ struct ContentView: View {
             }
             .fullScreenCover(isPresented: $defaults.isFirstStartUp) {
                 StartUpView()
-            }
-            .onChange(of: isShowAddNewItemView) { oldValue, newValue in
-                print(newValue)
             }
         }
     }
